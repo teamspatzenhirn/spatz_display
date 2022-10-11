@@ -7,5 +7,5 @@ docker build --tag spatz_display .
 
 ## run container
 ```
-docker run -ti --rm --net=host --env="DISPLAY" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" spatz_display
+docker run -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock spatz_display
 ```

@@ -15,7 +15,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install PySide6
 
 
-COPY main.py ./
+COPY *.py ./
 
 
 #ENV QT_DEBUG_PLUGINS=1

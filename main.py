@@ -27,6 +27,8 @@ toolbar_height = 100
 def start_ros():
     logging.info("Starting ROS (maybe)...")
 
+def yeet():
+    logging.info("YEET")
 def shutdown():
     logging.info("Shutting down...")
     sys.exit()
@@ -48,15 +50,21 @@ class MainWindow(QMainWindow):
         button_docker.clicked.connect(self.docker_version)
         button_docker.setFixedHeight(toolbar_height - toolbar_height * .1)
 
-        button_startros = QPushButton("Start ROS")
-        button_startros.clicked.connect(start_ros)
-        button_startros.setFixedSize(500, 500)
-
         button_exit = QPushButton("Exit")
         button_exit.clicked.connect(shutdown)
         button_exit.setFixedHeight(toolbar_height-toolbar_height*.1)
 
+        button_startros = QPushButton("Start ROS")
+        button_startros.clicked.connect(start_ros)
+        button_startros.setFixedSize(500, 500)
+
+        button_yeet = QPushButton("YEET")
+        button_yeet.clicked.connect(yeet)
+        button_yeet.setFixedSize(500, 500)
+
+
         layout.addWidget(button_startros, 0, 0)
+        layout.addWidget(button_yeet, 0, 1)
 
         toolbar.addWidget(button_docker)
         toolbar.addSeparator()

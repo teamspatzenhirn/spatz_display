@@ -1,57 +1,31 @@
 from PySide6.QtWidgets import (
-    QWidget,
-    QMainWindow,
-    QPushButton,
-    QGridLayout,
-    QToolBar
+    QTabWidget,
+    QVBoxLayout,
+    QDialog
 )
 
-from Docker import Docker
-from IOBoard import IOBoard
-from System import System
+from Docker import DockerTab
+from IOBoard import IOBoardTab
+from System import SystemTab
 
 
-class ViewController(QMainWindow):
+class ViewController(QDialog):
 
     def __init__(self):
         super(ViewController, self).__init__()
 
         self.initUI()
 
-    def initUI(self, toolbar_height=100):
+    def initUI(self):
+        tab_widget = QTabWidget()
+
+        tab_widget.addTab(DockerTab(self), "Docker")
+        tab_widget.addTab(IOBoardTab(self), "IOBoard")
+        tab_widget.addTab(SystemTab(self), "System")
+        tab_widget.setStyleSheet("QTabBar::tab { height: 200px; width: 200px;}")
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(tab_widget)
+        self.setLayout(main_layout)
         self.setWindowTitle("Spatz GUI")
-
-        layout = QGridLayout()
-
-        toolbar = QToolBar()
-        toolbar.setMovable(False)
-        toolbar.setFixedHeight(toolbar_height)
-        self.addToolBar(toolbar)
-
-        button_docker = QPushButton("Docker")
-        button_docker.clicked.connect(Docker.docker_info)
-        button_docker.setFixedHeight(toolbar_height - toolbar_height * .1)
-
-        button_exit = QPushButton("Exit")
-        button_exit.clicked.connect(System.shutdown)
-        button_exit.setFixedHeight(toolbar_height - toolbar_height * .1)
-
-        button_startros = QPushButton("Start ROS")
-        button_startros.clicked.connect(Docker.start_ros)
-        button_startros.setFixedSize(500, 500)
-
-        button_yeet = QPushButton("YEET")
-        button_yeet.clicked.connect(IOBoard.yeet)
-        button_yeet.setFixedSize(500, 500)
-
-        layout.addWidget(button_startros, 0, 0)
-        layout.addWidget(button_yeet, 0, 1)
-
-        toolbar.addWidget(button_docker)
-        toolbar.addSeparator()
-        toolbar.addWidget(button_exit)
-
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
         self.showFullScreen()

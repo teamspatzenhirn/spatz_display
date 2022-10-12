@@ -11,6 +11,25 @@ from PySide6.QtWidgets import (
 
 from setup_logger import logging
 
+class Docker:
+    def __init__(self):
+        super().__init__()
+
+    def start_ros(self):
+        logging.info("Starting ROS (maybe)...")
+        print("Starting ROS (maybe)...")
+
+    def getVersion(self) -> str:
+        docker_version = subprocess.run(['docker', 'version', '--format', "'{{.Server.Version}}'"],
+                                        stdout=subprocess.PIPE).stdout.decode("utf-8")
+        logging.info("Docker Server version: {version}".format(version=docker_version))
+        return docker_version
+
+    def getImages(self) -> str:
+        docker_images = subprocess.run(['docker', 'images'], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        logging.info("Docker images: {images}".format(images=docker_images))
+        return docker_images
+
 
 class DockerTab(QWidget):
     def __init__(self, parent: QWidget):
@@ -19,7 +38,7 @@ class DockerTab(QWidget):
         Gridlayout = QGridLayout()
 
         button_start_ros = QPushButton("Start ROS")
-        button_start_ros.clicked.connect(Docker.start_ros(self))
+        button_start_ros.clicked.connect(Docker.start_ros)
         button_start_ros.setFixedSize(500, 500)
 
         layout = QVBoxLayout()
@@ -37,20 +56,3 @@ class DockerTab(QWidget):
         self.setLayout(Gridlayout)
 
 
-class Docker:
-    def __init__(self):
-        super().__init__()
-
-    def start_ros(self):
-        logging.info("Starting ROS (maybe)...")
-
-    def getVersion(self) -> str:
-        docker_version = subprocess.run(['docker', 'version', '--format', "'{{.Server.Version}}'"],
-                                        stdout=subprocess.PIPE).stdout.decode("utf-8")
-        logging.info("Docker Server version: {version}".format(version=docker_version))
-        return docker_version
-
-    def getImages(self) -> str:
-        docker_images = subprocess.run(['docker', 'images'], stdout=subprocess.PIPE).stdout.decode("utf-8")
-        logging.info("Docker images: {images}".format(images=docker_images))
-        return docker_images

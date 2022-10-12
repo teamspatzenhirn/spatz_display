@@ -11,8 +11,7 @@ class IOBoard:
     def __init__(self):
         super().__init__()
 
-    @staticmethod
-    def yeet():
+    def yeet(self):
         logging.info("YEET")
 
 
@@ -23,7 +22,7 @@ class IOBoardTab(QWidget):
         layout = QGridLayout()
 
         button_yeet = QPushButton("YEET")
-        button_yeet.clicked.connect(IOBoard.yeet())
+        button_yeet.clicked.connect(IOBoard.yeet)
         button_yeet.setFixedSize(500, 500)
 
         layout.addWidget(button_yeet, 0, 0)

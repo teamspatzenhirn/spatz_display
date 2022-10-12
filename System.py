@@ -19,7 +19,6 @@ class System:
 
     def shutdown(self):
         logging.info("Shutting down...")
-        print("Shutting down...")
 
 
 class SystemTab(QWidget):

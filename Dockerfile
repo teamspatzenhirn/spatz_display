@@ -11,12 +11,12 @@ RUN apt install -y curl python3-dev python3-pip \
 
 RUN curl -sSL https://get.docker.com/ | sh
 
+COPY requirements.txt *.py /
+
 RUN pip3 install --upgrade pip
-RUN pip3 install PySide6
+RUN pip3 install -r requirements.txt
 
-
-COPY *.py ./
-
+ADD img /img
 
 #ENV QT_DEBUG_PLUGINS=1
 

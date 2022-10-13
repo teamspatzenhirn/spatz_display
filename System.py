@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
 )
 
 from setup_logger import logging
+from Screensaver import Screensaver
 
 
 class System:
@@ -19,24 +20,35 @@ class System:
 
     def shutdown(self):
         logging.info("Shutting down...")
-        print("Shutting down...")
 
 
 class SystemTab(QWidget):
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: QWidget, app):
         super().__init__(parent)
+        self.app = app
 
         layout = QGridLayout()
 
+        button_screensaver = QPushButton("Start Screensaver")
+        button_screensaver.clicked.connect(self.startScreenSaver)
+        button_screensaver.setFixedSize(400, 400)
+
         button_exit = QPushButton("Exit GUI")
         button_exit.clicked.connect(System.exitGUI)
-        button_exit.setFixedSize(500, 500)
+        button_exit.setFixedSize(400, 400)
 
         button_shutdown = QPushButton("Shutdown")
         button_shutdown.clicked.connect(System.shutdown)
-        button_shutdown.setFixedSize(500, 500)
+        button_shutdown.setFixedSize(400, 400)
 
-        layout.addWidget(button_exit, 0, 0)
-        layout.addWidget(button_shutdown, 0, 1)
+        layout.addWidget(button_screensaver, 0, 0)
+        layout.addWidget(button_exit, 1, 0)
+        layout.addWidget(button_shutdown, 1, 1)
 
         self.setLayout(layout)
+
+    def startScreenSaver(self):
+        logging.info("Starting Screensaver")
+        self.screensaver = Screensaver(self.app)
+        self.screensaver.running = True
+        self.screensaver.showFullScreen()

@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QTabWidget,
     QVBoxLayout,
-    QDialog
+    QWidget
 )
 
 from Docker import DockerTab
@@ -9,19 +9,20 @@ from IOBoard import IOBoardTab
 from System import SystemTab
 
 
-class ViewController(QDialog):
+class ViewController(QWidget):
 
-    def __init__(self):
+    def __init__(self, app):
+        self.app = app
         super(ViewController, self).__init__()
 
-        self.initUI()
+        self.initUI(app)
 
-    def initUI(self):
+    def initUI(self, app):
         tab_widget = QTabWidget()
 
         tab_widget.addTab(DockerTab(self), "Docker")
         tab_widget.addTab(IOBoardTab(self), "IOBoard")
-        tab_widget.addTab(SystemTab(self), "System")
+        tab_widget.addTab(SystemTab(self, self.app), "System")
         tab_widget.setStyleSheet("QTabBar::tab { height: 200px; width: 200px;}")
 
         main_layout = QVBoxLayout()

@@ -118,7 +118,7 @@ class Screensaver(QWidget):
                 x, y = target3
 
         # hits Y left
-        elif (p2[0] == 0):
+        elif (p2[0] == 0 and p2[1] != 0):
             v2 = v1 * np.array([-1, 1])
             # possible new target: x top
             target1 = get_intersect(p2, p2 + v2, [0, 0], [disp_width - Screensaver.spatz_width, 0])
@@ -150,7 +150,7 @@ class Screensaver(QWidget):
                 x, y = target3
 
         # hits X top
-        elif (p2[1] == 0):
+        elif (p2[1] == 0 and p2[0] != 0):
             v2 = v1 * np.array([1, -1])
             # possible new target: x bottom
             target1 = get_intersect(p2, p2 + v2, [0, disp_height-Screensaver.spatz_height], [disp_width-Screensaver.spatz_width, disp_height-Screensaver.spatz_height])

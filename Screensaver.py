@@ -30,8 +30,12 @@ class Screensaver(QWidget):
 
     last_pos = (0, 0)
 
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
+
+        # display size
+        self.disp_width = app.primaryScreen().size().width()
+        self.disp_height = app.primaryScreen().size().height()
 
         self.setStyleSheet("background-color:black")
         self.child = QSvgWidget("img/spatz.svg", self)
@@ -41,10 +45,9 @@ class Screensaver(QWidget):
         self.moveSpatz()
 
     def moveSpatz(self):
-        # display size
-        disp_width = app.primaryScreen().size().width()
-        disp_height = app.primaryScreen().size().height()
 
+        disp_width = self.disp_width
+        disp_height = self.disp_height
 
         # last target
         p1 = np.array([Screensaver.last_pos[0], Screensaver.last_pos[1]])
@@ -62,7 +65,7 @@ class Screensaver(QWidget):
                 x = random.randint(disp_width / 4, disp_width - Screensaver.spatz_width - disp_width / 4)
                 y = disp_height - Screensaver.spatz_height
             if xy == 'y':
-                x = disp_width - Screensaver.spatz_width
+                x = self.disp_width - Screensaver.spatz_width
                 y = random.randint(disp_height / 4, disp_height - Screensaver.spatz_height - disp_height / 4)
         # corner bottom left
         if (p2==np.array([0, disp_height-Screensaver.spatz_height])).all():
@@ -158,7 +161,7 @@ class Screensaver(QWidget):
             if(target3[1] >= 0 and target3[1] <= disp_height-Screensaver.spatz_height):
                 x, y = target3
 
-        speed = .5
+        speed = 1
         distance = math.sqrt((self.child.pos().x() - x) ** 2 + (self.child.pos().y() - y) ** 2)
         time = round(distance / speed)
 
@@ -169,13 +172,16 @@ class Screensaver(QWidget):
 
         Screensaver.last_pos = p2
 
+
     def mousePressEvent(self, e):
+        print("Closing Screensaver")
+        self.running = False
         self.close()
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    screensaver = Screensaver()
+    screensaver = Screensaver(app)
     screensaver.showFullScreen()
     screensaver.show()
     app.exec()

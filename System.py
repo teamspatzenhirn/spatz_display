@@ -14,12 +14,6 @@ class System:
     def __init__(self):
         super().__init__()
 
-    def startScreenSaver(self):
-        logging.info("Starting Screensaver")
-        screensaver = Screensaver()
-        screensaver.showFullScreen()
-        screensaver.show()
-
     def exitGUI(self):
         logging.info("Exit GUI")
         sys.exit()
@@ -29,13 +23,14 @@ class System:
 
 
 class SystemTab(QWidget):
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: QWidget, app):
         super().__init__(parent)
+        self.app = app
 
         layout = QGridLayout()
 
         button_screensaver = QPushButton("Start Screensaver")
-        button_screensaver.clicked.connect(System.startScreenSaver)
+        button_screensaver.clicked.connect(self.startScreenSaver)
         button_screensaver.setFixedSize(400, 400)
 
         button_exit = QPushButton("Exit GUI")
@@ -51,3 +46,16 @@ class SystemTab(QWidget):
         layout.addWidget(button_shutdown, 1, 1)
 
         self.setLayout(layout)
+
+    def startScreenSaver(self):
+        logging.info("Starting Screensaver")
+        self.parent().parent().parent().hide()
+        self.screensaver = Screensaver(self.app)
+        self.screensaver.running = True
+        self.screensaver.showFullScreen()
+        self.screensaver.show()
+
+    def stopScreenSaver(self):
+        self.screensaver.close()
+        self.parent().parent().parent().showFullScreen()
+        self.parent().parent().parent().show()

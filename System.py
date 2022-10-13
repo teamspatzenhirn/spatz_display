@@ -49,13 +49,6 @@ class SystemTab(QWidget):
 
     def startScreenSaver(self):
         logging.info("Starting Screensaver")
-        self.parent().parent().parent().hide()
         self.screensaver = Screensaver(self.app)
         self.screensaver.running = True
         self.screensaver.showFullScreen()
-        self.screensaver.show()
-
-    def stopScreenSaver(self):
-        self.screensaver.close()
-        self.parent().parent().parent().showFullScreen()
-        self.parent().parent().parent().show()

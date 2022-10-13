@@ -37,6 +37,10 @@ class Screensaver(QWidget):
         self.disp_width = app.primaryScreen().size().width()
         self.disp_height = app.primaryScreen().size().height()
 
+        self.app = app
+
+        self.running = True
+
         self.setStyleSheet("background-color:black")
         self.child = QSvgWidget("img/spatz.svg", self)
         self.child.resize(Screensaver.spatz_width, Screensaver.spatz_height)
@@ -168,7 +172,9 @@ class Screensaver(QWidget):
         print("Target: " + str(x) + ", " + str(y))
         self.anim.setEndValue(QPoint(x, y))
         self.anim.setDuration(time)
-        self.anim.start()
+
+        if(self.running):
+            self.anim.start()
 
         Screensaver.last_pos = p2
 
@@ -182,6 +188,7 @@ class Screensaver(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     screensaver = Screensaver(app)
+    screensaver.running = True
     screensaver.showFullScreen()
     screensaver.show()
     app.exec()

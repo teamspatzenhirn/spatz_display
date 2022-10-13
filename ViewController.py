@@ -1,16 +1,15 @@
 from PySide6.QtWidgets import (
     QTabWidget,
     QVBoxLayout,
-    QDialog
+    QWidget
 )
 
 from Docker import DockerTab
 from IOBoard import IOBoardTab
 from System import SystemTab
-from Screensaver import Screensaver
 
 
-class ViewController(QDialog):
+class ViewController(QWidget):
 
     def __init__(self, app):
         self.app = app
@@ -31,9 +30,3 @@ class ViewController(QDialog):
         self.setLayout(main_layout)
         self.setWindowTitle("Spatz GUI")
         self.showFullScreen()
-
-    def mousePressEvent(self, QMouseEvent):
-        # print mouse position
-        print(QMouseEvent.pos())
-        SystemTab.stopScreenSaver()
-

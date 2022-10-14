@@ -30,24 +30,37 @@ class Docker:
         logging.info("Docker images: {images}".format(images=docker_images))
         return docker_images
 
+    def getADEVersion(self) -> str:
+        ade_version = subprocess.run(['/usr/local/bin/ade', '--version'], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        logging.info("ADE version: {version}".format(version=ade_version))
+        return ade_version
+
 
 class DockerTab(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
+        app = self.parent().app
+        self.disp_width = app.primaryScreen().size().width()
+        self.disp_height = app.primaryScreen().size().height()
+        btn_size = self.disp_width/5
+
         Gridlayout = QGridLayout()
 
         button_start_ros = QPushButton("Start ROS")
         button_start_ros.clicked.connect(Docker.start_ros)
-        button_start_ros.setFixedSize(500, 500)
+        button_start_ros.setFixedSize(btn_size, btn_size)
 
         layout = QVBoxLayout()
         layout.setAlignment(QtCore.Qt.AlignCenter)
-        version = QLabel("Version: {version}".format(version=Docker.getVersion(self)))
+        ade_version = QLabel("ADE Version: {version}".format(version=Docker.getADEVersion(self)))
+        ade_version.setAlignment(QtCore.Qt.AlignCenter)
+        version = QLabel("Docker Version: {version}".format(version=Docker.getVersion(self)))
         version.setAlignment(QtCore.Qt.AlignCenter)
-        layout.addWidget(version)
         images = QLabel("Images: {images}".format(images=Docker.getImages(self)))
         images.setAlignment(QtCore.Qt.AlignCenter)
+        layout.addWidget(ade_version)
+        layout.addWidget(version)
         layout.addWidget(images)
 
         Gridlayout.addWidget(button_start_ros, 0, 0)

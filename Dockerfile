@@ -18,6 +18,10 @@ RUN pip3 install -r requirements.txt
 
 ADD img /img
 
+ADD https://gitlab.com/ApexAI/ade-cli/uploads/591bf9c7ef766cf859749b21afa700b7/ade+x86_64 /usr/local/bin/ade
+RUN chmod 0755 /usr/local/bin/ade
+
+
 #ENV QT_DEBUG_PLUGINS=1
 
 ENTRYPOINT [ "python3", "main.py" ]

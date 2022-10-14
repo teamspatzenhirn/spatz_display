@@ -26,7 +26,6 @@ def get_intersect(a1, a2, b1, b2):
 
 
 class Screensaver(QWidget):
-    spatz_width, spatz_height = 300, 300
 
     last_pos = (0, 0)
 
@@ -37,13 +36,16 @@ class Screensaver(QWidget):
         self.disp_width = app.primaryScreen().size().width()
         self.disp_height = app.primaryScreen().size().height()
 
+        self.spatz_width = self.spatz_height = self.disp_width * .25
+        self.speed = .5
+
         self.app = app
 
         self.running = True
 
         self.setStyleSheet("background-color:black")
         self.child = QSvgWidget("img/spatz.svg", self)
-        self.child.resize(Screensaver.spatz_width, Screensaver.spatz_height)
+        self.child.resize(self.spatz_width, self.spatz_height)
         self.anim = QPropertyAnimation(self.child, b"pos")
         self.anim.finished.connect(self.moveSpatz)
         self.moveSpatz()
@@ -53,121 +55,117 @@ class Screensaver(QWidget):
         disp_width = self.disp_width
         disp_height = self.disp_height
 
-        # last target
-        p1 = np.array([Screensaver.last_pos[0], Screensaver.last_pos[1]])
-
         # current pos
-        p2 = np.array([self.child.pos().x(), self.child.pos().y()])
+        pos = np.array([self.child.pos().x(), self.child.pos().y()])
 
         # last movement
-        v1 = p2-p1
+        v1 = pos-Screensaver.last_pos
 
         # corner top left
-        if (p2==np.array([0, 0])).all():
+        if (pos==np.array([0, 0])).all():
             xy = random.choice(['x', 'y'])
             if xy == 'x':
-                x = random.randint(disp_width / 4, disp_width - Screensaver.spatz_width - disp_width / 4)
-                y = disp_height - Screensaver.spatz_height
+                x = random.randint(disp_width / 4, disp_width - self.spatz_width - disp_width / 4)
+                y = disp_height - self.spatz_height
             if xy == 'y':
-                x = self.disp_width - Screensaver.spatz_width
-                y = random.randint(disp_height / 4, disp_height - Screensaver.spatz_height - disp_height / 4)
+                x = self.disp_width - self.spatz_width
+                y = random.randint(disp_height / 4, disp_height - self.spatz_height - disp_height / 4)
         # corner bottom left
-        if (p2==np.array([0, disp_height-Screensaver.spatz_height])).all():
+        if (pos==np.array([0, disp_height-self.spatz_height])).all():
             xy = random.choice(['x', 'y'])
             if xy == 'x':
-                x = random.randint(disp_width / 4, disp_width - Screensaver.spatz_width - disp_width / 4)
-                y = disp_height - Screensaver.spatz_height
+                x = random.randint(disp_width / 4, disp_width - self.spatz_width - disp_width / 4)
+                y = disp_height - self.spatz_height
             if xy == 'y':
-                x = disp_width - Screensaver.spatz_width
-                y = random.randint(disp_height / 4, disp_height - Screensaver.spatz_height - disp_height / 4)
+                x = disp_width - self.spatz_width
+                y = random.randint(disp_height / 4, disp_height - self.spatz_height - disp_height / 4)
 
         # corner top right
-        if (p2==np.array([disp_width-Screensaver.spatz_width, 0])).all():
+        if (pos==np.array([disp_width-self.spatz_width, 0])).all():
             xy = random.choice(['x', 'y'])
             if xy == 'x':
-                x = random.randint(disp_width / 4, disp_width - Screensaver.spatz_width - disp_width / 4)
-                y = disp_height - Screensaver.spatz_height
+                x = random.randint(disp_width / 4, disp_width - self.spatz_width - disp_width / 4)
+                y = disp_height - self.spatz_height
             if xy == 'y':
-                x = disp_width - Screensaver.spatz_width
-                y = random.randint(disp_height / 4, disp_height - Screensaver.spatz_height - disp_height / 4)
+                x = disp_width - self.spatz_width
+                y = random.randint(disp_height / 4, disp_height - self.spatz_height - disp_height / 4)
         # corner bottom right
-        if (p2==np.array([disp_width-Screensaver.spatz_width, disp_height-Screensaver.spatz_height])).all():
+        if (pos==np.array([disp_width-self.spatz_width, disp_height-self.spatz_height])).all():
             xy = random.choice(['x', 'y'])
             if xy == 'x':
-                x = random.randint(disp_width / 4, disp_width - Screensaver.spatz_width - disp_width / 4)
-                y = disp_height - Screensaver.spatz_height
+                x = random.randint(disp_width / 4, disp_width - self.spatz_width - disp_width / 4)
+                y = disp_height - self.spatz_height
             if xy == 'y':
-                x = disp_width - Screensaver.spatz_width
-                y = random.randint(disp_height / 4, disp_height - Screensaver.spatz_height - disp_height / 4)
+                x = disp_width - self.spatz_width
+                y = random.randint(disp_height / 4, disp_height - self.spatz_height - disp_height / 4)
 
 
         # hits Y right
-        elif (p2[0] == disp_width-Screensaver.spatz_width):
+        elif (pos[0] == disp_width-self.spatz_width):
             v2 = v1 * np.array([-1, 1])
             # possible new target: x top
-            target1 = get_intersect(p2, p2 + v2, [0, 0], [disp_width - Screensaver.spatz_width, 0])
-            if (target1[0] >= 0 and target1[0] <= disp_width - Screensaver.spatz_width):
+            target1 = get_intersect(pos, pos + v2, [0, 0], [disp_width - self.spatz_width, 0])
+            if (target1[0] >= 0 and target1[0] <= disp_width - self.spatz_width):
                 x, y = target1
             # possible new target: x bottom
-            target2 = get_intersect(p2, p2 + v2, [0, disp_height-Screensaver.spatz_height], [disp_width-Screensaver.spatz_width, disp_height-Screensaver.spatz_height])
-            if(target2[0] >= 0 and target2[0] <= disp_width-Screensaver.spatz_width):
+            target2 = get_intersect(pos, pos + v2, [0, disp_height-self.spatz_height], [disp_width-self.spatz_width, disp_height-self.spatz_height])
+            if(target2[0] >= 0 and target2[0] <= disp_width-self.spatz_width):
                 x, y = target2
             # possible new target: y left
-            target3 = get_intersect(p2, p2 + v2, [0, 0], [0, disp_height-Screensaver.spatz_height])
-            if(target3[1] >= 0 and target3[1] <= disp_height-Screensaver.spatz_height):
+            target3 = get_intersect(pos, pos + v2, [0, 0], [0, disp_height-self.spatz_height])
+            if(target3[1] >= 0 and target3[1] <= disp_height-self.spatz_height):
                 x, y = target3
 
         # hits Y left
-        elif (p2[0] == 0 and p2[1] != 0):
+        elif (pos[0] == 0 and pos[1] != 0):
             v2 = v1 * np.array([-1, 1])
             # possible new target: x top
-            target1 = get_intersect(p2, p2 + v2, [0, 0], [disp_width - Screensaver.spatz_width, 0])
-            if (target1[0] >= 0 and target1[0] <= disp_width - Screensaver.spatz_width):
+            target1 = get_intersect(pos, pos + v2, [0, 0], [disp_width - self.spatz_width, 0])
+            if (target1[0] >= 0 and target1[0] <= disp_width - self.spatz_width):
                 x, y = target1
             # possible new target: x bottom
-            target2 = get_intersect(p2, p2 + v2, [0, disp_height-Screensaver.spatz_height], [disp_width-Screensaver.spatz_width, disp_height-Screensaver.spatz_height])
-            if(target2[0] >= 0 and target2[0] <= disp_width-Screensaver.spatz_width):
+            target2 = get_intersect(pos, pos + v2, [0, disp_height-self.spatz_height], [disp_width-self.spatz_width, disp_height-self.spatz_height])
+            if(target2[0] >= 0 and target2[0] <= disp_width-self.spatz_width):
                 x, y = target2
             # possible new target: y right
-            target3 = get_intersect(p2, p2 + v2, [disp_width-Screensaver.spatz_width, 0], [disp_width-Screensaver.spatz_width, disp_height])
-            if(target3[1] >= 0 and target3[1] <= disp_height-Screensaver.spatz_height):
+            target3 = get_intersect(pos, pos + v2, [disp_width-self.spatz_width, 0], [disp_width-self.spatz_width, disp_height])
+            if(target3[1] >= 0 and target3[1] <= disp_height-self.spatz_height):
                 x, y = target3
 
         # hits X bottom
-        elif (p2[1] == disp_height-Screensaver.spatz_height):
+        elif (pos[1] == disp_height-self.spatz_height):
             v2 = v1 * np.array([1, -1])
             # possible new target: x top
-            target1 = get_intersect(p2, p2+v2, [0, 0], [disp_width-Screensaver.spatz_width, 0])
-            if(target1[0] >= 0 and target1[0] <= disp_width-Screensaver.spatz_width):
+            target1 = get_intersect(pos, pos+v2, [0, 0], [disp_width-self.spatz_width, 0])
+            if(target1[0] >= 0 and target1[0] <= disp_width-self.spatz_width):
                 x, y = target1
             # possible new target: y right
-            target2 = get_intersect(p2, p2 + v2, [disp_width-Screensaver.spatz_width, 0], [disp_width-Screensaver.spatz_width, disp_height])
-            if(target2[1] >= 0 and target2[1] <= disp_height-Screensaver.spatz_height):
+            target2 = get_intersect(pos, pos + v2, [disp_width-self.spatz_width, 0], [disp_width-self.spatz_width, disp_height])
+            if(target2[1] >= 0 and target2[1] <= disp_height-self.spatz_height):
                 x, y = target2
             # possible new target: y left
-            target3 = get_intersect(p2, p2 + v2, [0, 0], [0, disp_height-Screensaver.spatz_height])
-            if(target3[1] >= 0 and target3[1] <= disp_height-Screensaver.spatz_height):
+            target3 = get_intersect(pos, pos + v2, [0, 0], [0, disp_height-self.spatz_height])
+            if(target3[1] >= 0 and target3[1] <= disp_height-self.spatz_height):
                 x, y = target3
 
         # hits X top
-        elif (p2[1] == 0 and p2[0] != 0):
+        elif (pos[1] == 0 and pos[0] != 0):
             v2 = v1 * np.array([1, -1])
             # possible new target: x bottom
-            target1 = get_intersect(p2, p2 + v2, [0, disp_height-Screensaver.spatz_height], [disp_width-Screensaver.spatz_width, disp_height-Screensaver.spatz_height])
-            if(target1[0] >= 0 and target1[0] <= disp_width-Screensaver.spatz_width):
+            target1 = get_intersect(pos, pos + v2, [0, disp_height-self.spatz_height], [disp_width-self.spatz_width, disp_height-self.spatz_height])
+            if(target1[0] >= 0 and target1[0] <= disp_width-self.spatz_width):
                 x, y = target1
             # possible new target: y right
-            target2 = get_intersect(p2, p2 + v2, [disp_width-Screensaver.spatz_width, 0], [disp_width-Screensaver.spatz_width, disp_height])
-            if(target2[1] >= 0 and target2[1] <= disp_height-Screensaver.spatz_height):
+            target2 = get_intersect(pos, pos + v2, [disp_width-self.spatz_width, 0], [disp_width-self.spatz_width, disp_height])
+            if(target2[1] >= 0 and target2[1] <= disp_height-self.spatz_height):
                 x, y = target2
             # possible new target: y left
-            target3 = get_intersect(p2, p2 + v2, [0, 0], [0, disp_height-Screensaver.spatz_height])
-            if(target3[1] >= 0 and target3[1] <= disp_height-Screensaver.spatz_height):
+            target3 = get_intersect(pos, pos + v2, [0, 0], [0, disp_height-self.spatz_height])
+            if(target3[1] >= 0 and target3[1] <= disp_height-self.spatz_height):
                 x, y = target3
 
-        speed = 1
         distance = math.sqrt((self.child.pos().x() - x) ** 2 + (self.child.pos().y() - y) ** 2)
-        time = round(distance / speed)
+        time = round(distance / self.speed)
 
         print("Target: " + str(x) + ", " + str(y))
         self.anim.setEndValue(QPoint(x, y))
@@ -176,7 +174,7 @@ class Screensaver(QWidget):
         if(self.running):
             self.anim.start()
 
-        Screensaver.last_pos = p2
+        Screensaver.last_pos = pos
 
 
     def mousePressEvent(self, e):

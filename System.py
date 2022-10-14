@@ -23,23 +23,28 @@ class System:
 
 
 class SystemTab(QWidget):
-    def __init__(self, parent: QWidget, app):
+    def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.app = app
+
+        self.app =self.parent().app
+
+        self.disp_width = self.app.primaryScreen().size().width()
+        self.disp_height = self.app.primaryScreen().size().height()
+        btn_size = self.disp_width/5
 
         layout = QGridLayout()
 
         button_screensaver = QPushButton("Start Screensaver")
         button_screensaver.clicked.connect(self.startScreenSaver)
-        button_screensaver.setFixedSize(400, 400)
+        button_screensaver.setFixedSize(btn_size, btn_size)
 
         button_exit = QPushButton("Exit GUI")
         button_exit.clicked.connect(System.exitGUI)
-        button_exit.setFixedSize(400, 400)
+        button_exit.setFixedSize(btn_size, btn_size)
 
         button_shutdown = QPushButton("Shutdown")
         button_shutdown.clicked.connect(System.shutdown)
-        button_shutdown.setFixedSize(400, 400)
+        button_shutdown.setFixedSize(btn_size, btn_size)
 
         layout.addWidget(button_screensaver, 0, 0)
         layout.addWidget(button_exit, 1, 0)

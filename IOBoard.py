@@ -6,7 +6,11 @@ from PySide6.QtWidgets import (
 
 from setup_logger import logging
 
-import protobuf
+import protobuf_generated.container_pb2 as Container_pb2
+from protobuf_generated import setpoint_pb2
+
+import socket
+
 
 class IOBoard:
     def __init__(self):
@@ -14,6 +18,12 @@ class IOBoard:
 
     def yeet(self):
         logging.info("YEET")
+        msg = Container_pb2.NUCtoIOBoardContainer()
+        msg.yeetSetpoint = setpoint_pb2.YeetSetpoint()
+        binary = msg.SerializeToString()
+        # send UDP packet to IOBoard
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(bytes(binary, "utf-8"), ('10.0.0.2', 1337))
 
 
 class IOBoardTab(QWidget):

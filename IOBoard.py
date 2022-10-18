@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
 
 from setup_logger import logging
 
+import protobuf
 
 class IOBoard:
     def __init__(self):

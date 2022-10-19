@@ -1,0 +1,3 @@
+[submodule "protobuf_types"]
+	path = protobuf_types
+	url = https://github.com/teamspatzenhirn/protobuf_types

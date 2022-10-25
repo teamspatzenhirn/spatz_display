@@ -1,5 +1,4 @@
-import subprocess
-
+import subprocess, os
 import docker
 
 from PySide6 import QtCore
@@ -22,7 +21,11 @@ class Docker:
         print("Starting ROS (maybe)...")
 
     def getADEVersion(self) -> str:
-        ade_version = subprocess.run(['/usr/local/bin/ade', '--version'], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        path = '/usr/local/bin/ade'
+        if os.path.isfile(path):
+            ade_version = subprocess.run([path, '--version'], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        else:
+            return "ADE not found"
         logging.info("ADE version: {version}".format(version=ade_version))
         return ade_version
 

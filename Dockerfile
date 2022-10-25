@@ -2,7 +2,8 @@
 
 FROM ubuntu:22.04
 
-RUN apt update && apt install -y curl git python3-dev python3-pip \
+RUN apt update && apt install -y curl git unzip \
+	python3-dev python3-pip \
 	libglib2.0-0 libgl1 libegl1-mesa libxkbcommon-x11-0 \
 	libdbus-1-3 libxcb-xkb1 libxcb-icccm4 libxcb-image0 \
 	libxcb-keysyms1 libxcb-render-util0 libxcb-shape0 

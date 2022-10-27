@@ -2,6 +2,7 @@ import subprocess, os
 import docker
 
 from PySide6 import QtCore
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,

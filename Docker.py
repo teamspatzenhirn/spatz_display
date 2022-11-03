@@ -18,7 +18,6 @@ class Docker:
 
     def start_ros(self):
         logging.info("Starting ROS (maybe)...")
-        print("Starting ROS (maybe)...")
 
     def getADEVersion(self) -> str:
         path = '/usr/local/bin/ade'
@@ -26,7 +25,7 @@ class Docker:
             ade_version = subprocess.run([path, '--version'], stdout=subprocess.PIPE).stdout.decode("utf-8")
         else:
             return "ADE not found"
-        logging.info("ADE version: {version}".format(version=ade_version))
+        logging.info(f"ADE version: {ade_version}")
         return ade_version
 
 
@@ -49,9 +48,9 @@ class DockerTab(QWidget):
 
         layout = QVBoxLayout()
         layout.setAlignment(QtCore.Qt.AlignCenter)
-        ade_version = QLabel("ADE Version: {version}".format(version=Docker.getADEVersion(self)))
+        ade_version = QLabel(f"ADE Version: {Docker.getADEVersion(self)}")
         ade_version.setAlignment(QtCore.Qt.AlignCenter)
-        version = QLabel("Docker Version: {version}".format(version=self.getDockerVersion()))
+        version = QLabel(f"Docker Version: {self.getDockerVersion()}")
         version.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(ade_version)
         layout.addWidget(version)
@@ -76,7 +75,7 @@ class DockerTab(QWidget):
 
         for index, image in enumerate(list):
             if(len(image.tags)) > 0:
-                label = QLabel("{image}".format(image=image.tags[0]))
+                label = QLabel(f"{image.tags[0]}")
                 label.setAlignment(QtCore.Qt.AlignLeft)
                 indexLabel = QLabel(str(index))
                 indexLabel.setAlignment(QtCore.Qt.AlignRight)
@@ -89,7 +88,7 @@ class DockerTab(QWidget):
 
     def getDockerVersion(self):
         version = self.client.version()['Components'][0]['Version']
-        logging.info("Docker Server version: {version}".format(version=version))
+        logging.info(f"Docker Server version: {version}")
         return version
 
 

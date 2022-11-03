@@ -29,7 +29,7 @@ class ViewController(QWidget):
         tab_widget.addTab(DockerTab(self), "Docker")
         tab_widget.addTab(IOBoardTab(self), "IOBoard")
         tab_widget.addTab(SystemTab(self), "System")
-        tab_widget.setStyleSheet("QTabBar::tab {{ height: {tab_size}px; width: {tab_size}px;}}".format(tab_size=tab_size))
+        tab_widget.setStyleSheet(f"QTabBar::tab {{ height: {tab_size}px; width: {tab_size}px;}}")
         #tab_widget.setStyleSheet("QTabBar::tab { height: 200px; width: 200px;}")
 
         main_layout = QVBoxLayout()

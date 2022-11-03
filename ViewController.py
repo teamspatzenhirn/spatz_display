@@ -1,7 +1,8 @@
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QTabWidget,
     QVBoxLayout,
-    QWidget
+    QWidget,
 )
 
 from Docker import DockerTab
@@ -31,6 +32,8 @@ class ViewController(QWidget):
         tab_widget.addTab(SystemTab(self), "System")
         tab_widget.setStyleSheet(f"QTabBar::tab {{ height: {tab_size}px; width: {tab_size}px;}}")
         #tab_widget.setStyleSheet("QTabBar::tab { height: 200px; width: 200px;}")
+
+        tab_widget.setFont(QFont('Arial', 20))
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(tab_widget)

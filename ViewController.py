@@ -1,4 +1,11 @@
-from PySide6.QtGui import QFont
+from PySide6.QtGui import (
+    QFont,
+    QIcon
+)
+
+from PySide6.QtCore import (
+    QSize
+)
 from PySide6.QtWidgets import (
     QTabWidget,
     QVBoxLayout,
@@ -26,9 +33,12 @@ class ViewController(QWidget):
         tab_size = round(self.disp_height/5)
 
         tab_widget = QTabWidget()
-
-        tab_widget.addTab(DockerTab(self), "Docker")
-        tab_widget.addTab(IOBoardTab(self), "IOBoard")
+        tab_index1 = tab_widget.addTab(DockerTab(self), "Docker")
+        tab_widget.setTabIcon(tab_index1, QIcon('img/docker.webp'))
+        tab_widget.setIconSize(QSize(100, 100))
+        tab_index2 = tab_widget.addTab(IOBoardTab(self), "IOBoard")
+        tab_widget.setTabIcon(tab_index2, QIcon('img/pcbnew.png'))
+        tab_widget.setIconSize(QSize(100, 100))
         tab_widget.addTab(SystemTab(self), "System")
         tab_widget.setStyleSheet(f"QTabBar::tab {{ height: {tab_size}px; width: {tab_size}px;}}")
         #tab_widget.setStyleSheet("QTabBar::tab { height: 200px; width: 200px;}")

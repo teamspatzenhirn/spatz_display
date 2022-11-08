@@ -13,28 +13,12 @@ from PySide6.QtWidgets import (
 
 from setup_logger import logging
 
-class Docker:
-    def __init__(self):
-        super().__init__()
-
-    def start_ros(self):
-        logging.info("Starting ROS (maybe)...")
-
-    def getADEVersion(self) -> str:
-        path = '/usr/local/bin/ade'
-        if os.path.isfile(path):
-            ade_version = subprocess.run([path, '--version'], stdout=subprocess.PIPE).stdout.decode("utf-8")
-        else:
-            return "ADE not found"
-        logging.info(f"ADE version: {ade_version}")
-        return ade_version
-
-
 class DockerTab(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
         self.client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        self.ade_path = '/usr/local/bin/ade'
 
         app = self.parent().app
         self.disp_width = app.primaryScreen().size().width()
@@ -44,12 +28,12 @@ class DockerTab(QWidget):
         Gridlayout = QGridLayout()
 
         button_start_ros = QPushButton("Start ROS")
-        button_start_ros.clicked.connect(Docker.start_ros)
+        button_start_ros.clicked.connect(self.start_ros())
         button_start_ros.setFixedSize(btn_size, btn_size)
 
         layout = QVBoxLayout()
         layout.setAlignment(QtCore.Qt.AlignCenter)
-        ade_version = QLabel(f"ADE Version: {Docker.getADEVersion(self)}")
+        ade_version = QLabel(f"ADE Version: {self.getADEVersion()}")
         ade_version.setAlignment(QtCore.Qt.AlignCenter)
         version = QLabel(f"Docker Version: {self.getDockerVersion()}")
         version.setAlignment(QtCore.Qt.AlignCenter)
@@ -92,4 +76,16 @@ class DockerTab(QWidget):
         logging.info(f"Docker Server version: {version}")
         return version
 
+    def start_ros(self):
+        logging.info("Starting ROS (maybe)...")
+        # ~/ade-home/2021$ ade start
+        subprocess.Popen([self.ade_path, "start"], cwd="~/ade-home/2021")
+
+    def getADEVersion(self) -> str:
+        if os.path.isfile(self.ade_path):
+            ade_version = subprocess.run([self.ade_path, '--version'], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        else:
+            return "ADE not found"
+        logging.info(f"ADE version: {ade_version}")
+        return ade_version
 

@@ -2,13 +2,13 @@ import subprocess, os
 import docker
 
 from PySide6 import QtCore
-from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QWidget,
     QGridLayout,
-    QPushButton
+    QPushButton,
+    QTextEdit
 )
 
 from setup_logger import logging
@@ -28,7 +28,7 @@ class DockerTab(QWidget):
         Gridlayout = QGridLayout()
 
         button_start_ros = QPushButton("Start ROS")
-        button_start_ros.clicked.connect(self.start_ros())
+        button_start_ros.clicked.connect(self.start_ros)
         button_start_ros.setFixedSize(btn_size, btn_size)
 
         layout = QVBoxLayout()
@@ -41,8 +41,12 @@ class DockerTab(QWidget):
         layout.addWidget(version)
         layout.addWidget(self.getDockerImages())
 
+        self.terminal = QTextEdit()
+        self.terminal.setReadOnly(True)
+
         Gridlayout.addWidget(button_start_ros, 0, 0)
         Gridlayout.addLayout(layout, 0, 1)
+        Gridlayout.addWidget(self.terminal, 1, 1)
 
         self.setLayout(Gridlayout)
 
@@ -79,7 +83,9 @@ class DockerTab(QWidget):
     def start_ros(self):
         logging.info("Starting ROS (maybe)...")
         # ~/ade-home/2021$ ade start
-        subprocess.Popen([self.ade_path, "start"], cwd="~/ade-home/2021")
+        ade_output = subprocess.run([self.ade_path, '--version'], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        self.terminal.insertPlainText("➜ " + self.ade_path + " --verison\n")
+        self.terminal.insertPlainText(ade_output)
 
     def getADEVersion(self) -> str:
         if os.path.isfile(self.ade_path):

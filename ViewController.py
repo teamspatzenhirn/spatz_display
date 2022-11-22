@@ -16,6 +16,7 @@ from Docker import DockerTab
 from IOBoard import IOBoardTab
 from System import SystemTab
 
+from setup_logger import logging
 
 class ViewController(QWidget):
 
@@ -31,6 +32,7 @@ class ViewController(QWidget):
         self.disp_width = app.primaryScreen().size().width()
         self.disp_height = app.primaryScreen().size().height()
         tab_size = round(self.disp_height/5)
+        logging.info(f"Display size: {self.disp_width}x{self.disp_height}")
 
         tab_widget = QTabWidget()
         tab_index1 = tab_widget.addTab(DockerTab(self), "Docker")
@@ -43,10 +45,10 @@ class ViewController(QWidget):
         tab_widget.setStyleSheet(f"QTabBar::tab {{ height: {tab_size}px; width: {tab_size}px;}}")
         #tab_widget.setStyleSheet("QTabBar::tab { height: 200px; width: 200px;}")
 
-        tab_widget.setFont(QFont('Arial', 20))
+        #tab_widget.setFont(QFont('Arial', 20))
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(tab_widget)
         self.setLayout(main_layout)
         self.setWindowTitle("Spatz GUI")
-        self.showFullScreen()
+        #self.showFullScreen()

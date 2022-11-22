@@ -6,9 +6,13 @@
 docker build --tag spatz_display .
 ```
 
+
 ### run container
 ```
-docker run -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock spatz_display
+xhost +
+```
+```
+docker run -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock -v /home/spatz/ade-home/2021/.aderc:/.aderc spatz_display
 ```
 
 ---

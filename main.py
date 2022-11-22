@@ -11,9 +11,11 @@ def main():
     app.setStyleSheet(qdarktheme.load_stylesheet())
     app.setFont(QFont('Arial', 20), "QLabel")
     app.setFont(QFont('Arial', 20), "QPushButton")
+    app.setFont(QFont('Arial', 20), "QTabWidget")
+
 
     vc = ViewController(app)
-    vc.show()
+    vc.showFullScreen()
 
     app.exec()
 

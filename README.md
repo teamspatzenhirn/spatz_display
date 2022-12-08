@@ -1,18 +1,29 @@
 # spatz_display
 
 ## running with docker
+
+### prepare named pipes
+Create pipes with `sudo mkfifo /mnt/inputpipe /mnt/outputpipe`.
+
+Set permissions for pipes with `sudo chown spatz /mnt/*pipe`
+
+Execute stuff from pipes and send output back to docker:
+```
+while true;
+    do eval "$(cat /mnt/inputpipe)" 2>&1 | tee /mnt/outputpipe;
+done
+```
 ### build container
 ```
 docker build --tag spatz_display .
 ```
-
 
 ### run container
 ```
 xhost +
 ```
 ```
-docker run -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock -v /home/spatz/ade-home/2021/.aderc:/.aderc spatz_display
+docker run -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock -v /mnt/inputpipe:/mnt/inputpipe -v /mnt/outputpipe:/mnt/outputpipe spatz_display
 ```
 
 ---

@@ -1,11 +1,11 @@
+from PySide6.QtCore import (
+    QSize,
+)
+
 from PySide6.QtGui import (
-    QFont,
     QIcon
 )
 
-from PySide6.QtCore import (
-    QSize
-)
 from PySide6.QtWidgets import (
     QTabWidget,
     QVBoxLayout,
@@ -24,9 +24,10 @@ class ViewController(QWidget):
         self.app = app
         super(ViewController, self).__init__()
 
-        self.initUI(app)
+        self.initUI()
 
-    def initUI(self, app):
+
+    def initUI(self):
 
         app = self.app
         self.disp_width = app.primaryScreen().size().width()
@@ -43,12 +44,8 @@ class ViewController(QWidget):
         tab_widget.setIconSize(QSize(100, 100))
         tab_widget.addTab(SystemTab(self), "System")
         tab_widget.setStyleSheet(f"QTabBar::tab {{ height: {tab_size}px; width: {tab_size}px;}}")
-        #tab_widget.setStyleSheet("QTabBar::tab { height: 200px; width: 200px;}")
-
-        #tab_widget.setFont(QFont('Arial', 20))
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(tab_widget)
         self.setLayout(main_layout)
         self.setWindowTitle("Spatz GUI")
-        #self.showFullScreen()

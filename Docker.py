@@ -110,7 +110,7 @@ class DockerTab(QWidget):
             if ade_container.name == "ade":
                 logging.info(f"Found Container {ade_container.name} with id {container.id}")
                 launch_file = "freedrive_11_combined_perception.launch.py"
-                _, stream = ade_container.exec_run(cmd=f"/opt/ros/humble/bin/ros2 launch teamspatzenhirn_launch {launch_file}", stream=True, workdir="/home/spatz/2021")
+                _, stream = ade_container.exec_run(cmd=f"bash -li -c \"ros2 launch teamspatzenhirn_launch {launch_file}\"", stream=True, workdir="/home/spatz/2021")
                 for data in stream:
                     logging.info(data.decode())
                     self.terminal.appendPlainText(data.decode())

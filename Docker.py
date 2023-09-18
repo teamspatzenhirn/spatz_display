@@ -10,6 +10,8 @@ from PySide6.QtWidgets import (
 )
 
 from setup_logger import logging
+import vnc
+import asyncio
 
 class DockerTab(QWidget):
     def __init__(self, parent: QWidget):
@@ -104,17 +106,8 @@ class DockerTab(QWidget):
 
 
     def start_ros(self):
-        logging.info("Starting ROS (maybe)...")
-        for container in self.client.containers.list():
-            ade_container = self.client.containers.get(container.id)
-            if ade_container.name == "ade":
-                logging.info(f"Found Container {ade_container.name} with id {container.id}")
-                launch_file = "freedrive_11_combined_perception.launch.py"
-                source_file = "source install/setup.sh"
-                _, stream = ade_container.exec_run(cmd=f"bash -li -c \" {source_file} && ros2 launch teamspatzenhirn_launch {launch_file}\"", stream=True, workdir="/home/spatz/2021")
-                for data in stream:
-                    logging.info(data.decode())
-                    self.terminal.appendPlainText(data.decode())
+        logging.info("Starting ROS (VNC)...")
+        asyncio.run(vnc.start_ros2())
 
     def handle_stdout(self):
         data = self.outputpipe.readAllStandardOutput()

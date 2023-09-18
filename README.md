@@ -23,7 +23,7 @@ docker build --tag spatz_display .
 xhost +
 ```
 ```
-docker run --rm -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock -v /mnt/inputpipe:/mnt/inputpipe -v /mnt/outputpipe:/mnt/outputpipe spatz_display
+docker run --rm -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock --env VNC_HOST="localhost" --env VNC_PASSWD="" spatz_display
 ```
 
 ---

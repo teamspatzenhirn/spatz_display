@@ -26,12 +26,12 @@ class DockerTab(QWidget):
 
         gridlayout = QGridLayout()
 
-        self.button_start_ade = QPushButton("Start ADE")
-        self.button_start_ade.clicked.connect(self.start_ade)
+        self.button_start_ade = QPushButton("freedrive")
+        self.button_start_ade.clicked.connect(self.start_freedrive)
         self.button_start_ade.setFixedSize(btn_size, btn_size)
 
-        button_start_ros = QPushButton("Start ROS")
-        button_start_ros.clicked.connect(self.start_ros)
+        button_start_ros = QPushButton("obstacle")
+        button_start_ros.clicked.connect(self.start_obstacle)
         button_start_ros.setFixedSize(btn_size, btn_size)
 
         adeRunningStatus = QWidget()
@@ -85,13 +85,13 @@ class DockerTab(QWidget):
                     self.adeRunningStatusLabel_id.setText(f"{container.short_id}")
                     self.adeRunningStatusLabel_name.setText(f"{container.name}")
                     self.adeRunningStatusLabel_status.setText(f"{container.status}")
-                    self.button_start_ade.setDisabled(True)
+                    #self.button_start_ade.setDisabled(True)
                 else:
                     self.adeRunningStatusLabel_status.setText(f"not running")
-                    self.button_start_ade.setDisabled(False)
+                    #self.button_start_ade.setDisabled(False)
             except:
                 self.adeRunningStatusLabel_status.setText(f"not running")
-                self.button_start_ade.setDisabled(False)
+                #self.button_start_ade.setDisabled(False)
 
 
     def getDockerVersion(self):
@@ -104,10 +104,13 @@ class DockerTab(QWidget):
         self.terminal.clear()
         self.inputpipe.startDetached("/bin/bash", ["-c", "echo 'cd ~/ade-home/2021 && ade start' > /mnt/inputpipe"])
 
+    def start_freedrive(self):
+        logging.info("Starting ROS freedrive (VNC)...")
+        asyncio.run(vnc.start_ros2("freedrive_11_combined_perception.launch.py"))
 
-    def start_ros(self):
-        logging.info("Starting ROS (VNC)...")
-        asyncio.run(vnc.start_ros2())
+    def start_obstacle(self):
+        logging.info("Starting ROS obstacle (VNC)...")
+        asyncio.run(vnc.start_ros2("obstacle_11_combined_perception.launch.py"))
 
     def handle_stdout(self):
         data = self.outputpipe.readAllStandardOutput()

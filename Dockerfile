@@ -7,7 +7,7 @@ RUN apt update && apt install -y curl git unzip \
 	libglib2.0-0 libgl1 libegl1-mesa libxkbcommon-x11-0 \
 	libdbus-1-3 libxcb-xkb1 libxcb-icccm4 libxcb-image0 \
 	libxcb-keysyms1 libxcb-render-util0 libxcb-shape0 \
-	libxcb-xinerama0 libx11-xcb-dev '^libxcb.*-dev' # libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+	libxcb-xinerama0 libx11-xcb-dev tmux '^libxcb.*-dev' # libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
 
 COPY requirements.txt *.py /
 

@@ -20,12 +20,22 @@ docker build --tag spatz_display .
 
 ### run container
 ```
+docker run --rm -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock --env VNC_HOST="localhost" --env VNC_PASSWD="" spatz_display
+```
+### Run container with tmux
+```
+tmux -S /tmp/tmux-spatz #this has to be run by hand rn but should be ran at start up on the spatz
+```
+```
 xhost +
 ```
 ```
-docker run --rm -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock --env VNC_HOST="localhost" --env VNC_PASSWD="" spatz_display
+docker run --rm -ti --net=host --env="DISPLAY" -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/tmux-spatz:/tmp/tmux-spatz --env VNC_HOST="localhost" --env VNC_PASSWD="" spatz_display
 ```
-
+If you want to attach to the session for debugging purposes
+```
+tmux -S /tmp/tmux-spatz attach-session -t spatz
+```
 ---
 ## running without docker
 ### install dependencies

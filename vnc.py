@@ -7,6 +7,18 @@ from setup_logger import logging
 load_dotenv()
 
 async def start_ros2(launchfile):
+    # TODO: Think how to Implemente this
+    # There are 2 ways i can think of:
+    #  1. tmuxp in docker and start docker inside docker:
+    #     Pros: More robust in the way that we have full control of the tmux sessions and all its surrounding
+    #     Con: We dont have access to a lot of the host
+    #  2. tmuxp only attaches to an already running tmux server: (heavily favoring this)
+    #     Pro: acces to full tmux session on host so full accese to host
+    #     Con: we have to ensure tmux server is running
+
+    # To get the Server in the docker at tmp/tmux-spatz
+    # server = libtmux.Server(socket_path="tmp/tmux-spatz")
+
     async with asyncvnc.connect(os.getenv('VNC_HOST'), port=5901, password=os.getenv('VNC_PASSWD')) as client:
         logging.info(f"{client}")
         client.keyboard.press('Ctrl', 'Alt', 't')

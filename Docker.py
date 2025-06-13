@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 
 from setup_logger import logging
 import vnc
+import tmux
 import asyncio
 
 class DockerTab(QWidget):
@@ -18,6 +19,7 @@ class DockerTab(QWidget):
         super().__init__(parent)
 
         self.client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        self.tmux_server = tmux.tmux_server()
 
         app = self.parent().app
         self.disp_width = app.primaryScreen().size().width()
@@ -53,11 +55,14 @@ class DockerTab(QWidget):
         self.terminal = QPlainTextEdit()
         self.terminal.setReadOnly(True)
 
-        self.inputpipe = QtCore.QProcess()
-        self.outputpipe = QtCore.QProcess()
-        self.outputpipe.readyReadStandardOutput.connect(self.handle_stdout)
-        self.outputpipe.readyReadStandardError.connect(self.handle_stderr)
-        self.outputpipe.start("tail", ["-f", "/mnt/outputpipe"])
+        self.old_pane : list[str] = []#this is a list of all the already added content to the qplaintext element
+
+
+        #self.inputpipe = QtCore.QProcess()
+        #self.outputpipe = QtCore.QProcess()
+        #self.outputpipe.readyReadStandardOutput.connect(self.handle_stdout)
+        #self.outputpipe.readyReadStandardError.connect(self.handle_stderr)
+        #self.outputpipe.start("tail", ["-f", "/mnt/outputpipe"])
 
 
         gridlayout.addWidget(self.button_start_ade, 0, 0)
@@ -74,6 +79,7 @@ class DockerTab(QWidget):
 
 
     def update_timer(self):
+        self.updateTerminal()
         self.updateStatus()
 
 
@@ -93,6 +99,18 @@ class DockerTab(QWidget):
                 self.adeRunningStatusLabel_status.setText(f"not running")
                 #self.button_start_ade.setDisabled(False)
 
+    def updateTerminal(self):
+        cur_pane = self.tmux_server.get_text() # this only gives me the currently visible pane not anything above that
+
+        diff = []
+        for string in cur_pane:
+            if string not in self.old_pane:
+                diff.append(string)
+
+        if diff:
+            self.terminal.appendPlainText("\n".join(diff))
+
+        self.old_pane = cur_pane
 
     def getDockerVersion(self):
         version = self.client.version()['Components'][0]['Version']
@@ -104,13 +122,22 @@ class DockerTab(QWidget):
         self.terminal.clear()
         self.inputpipe.startDetached("/bin/bash", ["-c", "echo 'cd ~/ade-home/2021 && ade start' > /mnt/inputpipe"])
 
-    def start_freedrive(self):
-        logging.info("Starting ROS freedrive (VNC)...")
-        asyncio.run(vnc.start_ros2("freedrive_11_combined_perception.launch.py"))
 
     def start_obstacle(self):
+        logging.info("Starting ROS obstacle (tmux)...")
+        self.tmux_server.start_stack("obstacle_11_combined_perception.launch.py")
+    def start_freedrive(self):
+        logging.info("Starting ROS freedrive (tmux)...")
+        self.tmux_server.start_stack("freedrive_11_combined_perception.launch.py")
+
+
+    # just here for legacy reasons
+    def start_obstacle_vnc(self):
         logging.info("Starting ROS obstacle (VNC)...")
         asyncio.run(vnc.start_ros2("obstacle_11_combined_perception.launch.py"))
+    def start_freedrive_vnc(self):
+        logging.info("Starting ROS freedrive (VNC)...")
+        asyncio.run(vnc.start_ros2("freedrive_11_combined_perception.launch.py"))
 
     def handle_stdout(self):
         data = self.outputpipe.readAllStandardOutput()

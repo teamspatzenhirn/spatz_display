@@ -55,8 +55,6 @@ class DockerTab(QWidget):
         self.terminal = QPlainTextEdit()
         self.terminal.setReadOnly(True)
 
-        self.old_pane : list[str] = []#this is a list of all the already added content to the qplaintext element
-
 
         #self.inputpipe = QtCore.QProcess()
         #self.outputpipe = QtCore.QProcess()
@@ -100,17 +98,10 @@ class DockerTab(QWidget):
                 #self.button_start_ade.setDisabled(False)
 
     def updateTerminal(self):
-        cur_pane = self.tmux_server.get_text() # this only gives me the currently visible pane not anything above that
-
-        diff = []
-        for string in cur_pane:
-            if string not in self.old_pane:
-                diff.append(string)
-
+        # i check for changes and append them so that the textbox view doesnt reset up if i replace the entire text it scrolls back up and you can only see the first messages
+        diff = self.tmux_server.get_new_content()
         if diff:
             self.terminal.appendPlainText("\n".join(diff))
-
-        self.old_pane = cur_pane
 
     def getDockerVersion(self):
         version = self.client.version()['Components'][0]['Version']

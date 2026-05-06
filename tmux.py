@@ -17,7 +17,7 @@ class tmux_server:
 
 
     def start_stack(self, launchfile: str):
-        self.pane.send_keys("cd /home/corneliustiefenmoser/ade-home/2021/")
+        self.pane.send_keys("cd $HOME/ade-home/2021/")
         self.pane.send_keys("ade stop")
         self.pane.send_keys("ade start")
         self.pane.send_keys("ade enter")

@@ -1,0 +1,42 @@
+import asyncvnc
+import time, os
+from dotenv import load_dotenv
+
+from setup_logger import logging
+
+load_dotenv()
+
+async def start_ros2(launchfile):
+    # TODO: Think how to Implemente this
+    # There are 2 ways i can think of:
+    #  1. tmuxp in docker and start docker inside docker:
+    #     Pros: More robust in the way that we have full control of the tmux sessions and all its surrounding
+    #     Con: We dont have access to a lot of the host
+    #  2. tmuxp only attaches to an already running tmux server: (heavily favoring this)
+    #     Pro: acces to full tmux session on host so full accese to host
+    #     Con: we have to ensure tmux server is running
+
+    # To get the Server in the docker at tmp/tmux-spatz
+    # server = libtmux.Server(socket_path="tmp/tmux-spatz")
+
+    async with asyncvnc.connect(os.getenv('VNC_HOST'), port=5901, password=os.getenv('VNC_PASSWD')) as client:
+        logging.info(f"{client}")
+        client.keyboard.press('Ctrl', 'Alt', 't')
+        time.sleep(1)
+        client.keyboard.write('cd ade-home/2021/')
+        client.keyboard.press('Return')
+        time.sleep(.5)
+        client.keyboard.write('ade start')
+        client.keyboard.press('Return')
+        time.sleep(3)
+        client.keyboard.write('ade enter')
+        client.keyboard.press('Return')
+        time.sleep(4)
+        client.keyboard.write('cd 2021')
+        client.keyboard.press('Return')
+        time.sleep(.5)
+        client.keyboard.write('source install/setup.zsh')
+        client.keyboard.press('Return')
+        time.sleep(2)
+        client.keyboard.write('ros2 launch teamspatzenhirn_launch ' + launchfile)
+        client.keyboard.press('Return')

@@ -36,6 +36,8 @@ class Screensaver(QWidget):
         self.disp_width = app.primaryScreen().size().width()
         self.disp_height = app.primaryScreen().size().height()
 
+        print(f"Screensaver display size: {self.disp_width}x{self.disp_height}")
+
         self.spatz_width = self.spatz_height = self.disp_width * .25
         self.speed = .5
 

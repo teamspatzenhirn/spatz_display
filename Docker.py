@@ -1,95 +1,141 @@
-import subprocess, os
 import docker
 
 from PySide6 import QtCore
 from PySide6.QtWidgets import (
-    QVBoxLayout,
     QLabel,
     QWidget,
     QGridLayout,
-    QPushButton
+    QPushButton,
+    QPlainTextEdit
 )
 
 from setup_logger import logging
-
-class Docker:
-    def __init__(self):
-        super().__init__()
-
-    def start_ros(self):
-        logging.info("Starting ROS (maybe)...")
-        print("Starting ROS (maybe)...")
-
-    def getADEVersion(self) -> str:
-        path = '/usr/local/bin/ade'
-        if os.path.isfile(path):
-            ade_version = subprocess.run([path, '--version'], stdout=subprocess.PIPE).stdout.decode("utf-8")
-        else:
-            return "ADE not found"
-        logging.info("ADE version: {version}".format(version=ade_version))
-        return ade_version
-
+import vnc
+import tmux
+import asyncio
 
 class DockerTab(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
         self.client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        self.tmux_server = tmux.tmux_server()
 
         app = self.parent().app
         self.disp_width = app.primaryScreen().size().width()
         self.disp_height = app.primaryScreen().size().height()
-        btn_size = self.disp_width/5
+        btn_size = self.disp_width / 5
 
-        Gridlayout = QGridLayout()
+        gridlayout = QGridLayout()
 
-        button_start_ros = QPushButton("Start ROS")
-        button_start_ros.clicked.connect(Docker.start_ros)
+        self.button_start_ade = QPushButton("freedrive")
+        self.button_start_ade.clicked.connect(self.start_freedrive)
+        self.button_start_ade.setFixedSize(btn_size, btn_size)
+
+        button_start_ros = QPushButton("obstacle")
+        button_start_ros.clicked.connect(self.start_obstacle)
         button_start_ros.setFixedSize(btn_size, btn_size)
 
-        layout = QVBoxLayout()
-        layout.setAlignment(QtCore.Qt.AlignCenter)
-        ade_version = QLabel("ADE Version: {version}".format(version=Docker.getADEVersion(self)))
-        ade_version.setAlignment(QtCore.Qt.AlignCenter)
-        version = QLabel("Docker Version: {version}".format(version=self.getDockerVersion()))
-        version.setAlignment(QtCore.Qt.AlignCenter)
-        layout.addWidget(ade_version)
-        layout.addWidget(version)
-        layout.addWidget(self.getDockerImages())
+        adeRunningStatus = QWidget()
+        adeRunningStatusLayout = QGridLayout()
+        for index, entry in enumerate(["ID", "name", "status"]):
+            label = QLabel(entry)
+            adeRunningStatusLayout.addWidget(label, 0, index)
 
-        Gridlayout.addWidget(button_start_ros, 0, 0)
-        Gridlayout.addLayout(layout, 0, 1)
 
-        self.setLayout(Gridlayout)
+        self.adeRunningStatusLabel_id = QLabel()
+        self.adeRunningStatusLabel_name = QLabel()
+        self.adeRunningStatusLabel_status = QLabel()
+        adeRunningStatusLayout.addWidget(self.adeRunningStatusLabel_id, 1, 0)
+        adeRunningStatusLayout.addWidget(self.adeRunningStatusLabel_name, 1, 1)
+        adeRunningStatusLayout.addWidget(self.adeRunningStatusLabel_status, 1, 2)
 
-    def getDockerImages(self):
-        widget = QWidget()
-        layout = QGridLayout()
-        list = self.client.images.list()
+        adeRunningStatus.setLayout(adeRunningStatusLayout)
 
-        label = QLabel("Index")
-        label.setAlignment(QtCore.Qt.AlignRight)
-        layout.addWidget(label, 0, 0)
-        label = QLabel("Image Tag")
-        label.setAlignment(QtCore.Qt.AlignLeft)
-        layout.addWidget(label, 0, 1)
+        self.terminal = QPlainTextEdit()
+        self.terminal.setReadOnly(True)
 
-        for index, image in enumerate(list):
-            if(len(image.tags)) > 0:
-                label = QLabel("{image}".format(image=image.tags[0]))
-                label.setAlignment(QtCore.Qt.AlignLeft)
-                indexLabel = QLabel(str(index))
-                indexLabel.setAlignment(QtCore.Qt.AlignRight)
-                layout.addWidget(indexLabel, index+1, 0)
-                layout.addWidget(label, index+1, 1)
 
-        widget.setLayout(layout)
+        #self.inputpipe = QtCore.QProcess()
+        #self.outputpipe = QtCore.QProcess()
+        #self.outputpipe.readyReadStandardOutput.connect(self.handle_stdout)
+        #self.outputpipe.readyReadStandardError.connect(self.handle_stderr)
+        #self.outputpipe.start("tail", ["-f", "/mnt/outputpipe"])
 
-        return widget
+
+        gridlayout.addWidget(self.button_start_ade, 0, 0)
+        gridlayout.addWidget(button_start_ros, 1, 0)
+        gridlayout.addWidget(adeRunningStatus, 0, 1)
+        gridlayout.addWidget(self.terminal, 1, 1)
+
+        self.setLayout(gridlayout)
+
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(500)
+        self.timer.timeout.connect(self.update_timer)
+        self.timer.start()
+
+
+    def update_timer(self):
+        self.updateTerminal()
+        self.updateStatus()
+
+
+    def updateStatus(self):
+        for container in self.client.containers.list():
+            try:
+                ade_container = self.client.containers.get(container.id)
+                if ade_container.name == "ade":
+                    self.adeRunningStatusLabel_id.setText(f"{container.short_id}")
+                    self.adeRunningStatusLabel_name.setText(f"{container.name}")
+                    self.adeRunningStatusLabel_status.setText(f"{container.status}")
+                    #self.button_start_ade.setDisabled(True)
+                else:
+                    self.adeRunningStatusLabel_status.setText(f"not running")
+                    #self.button_start_ade.setDisabled(False)
+            except:
+                self.adeRunningStatusLabel_status.setText(f"not running")
+                #self.button_start_ade.setDisabled(False)
+
+    def updateTerminal(self):
+        # i check for changes and append them so that the textbox view doesnt reset up if i replace the entire text it scrolls back up and you can only see the first messages
+        diff = self.tmux_server.get_new_content()
+        if diff:
+            self.terminal.appendPlainText("\n".join(diff))
 
     def getDockerVersion(self):
         version = self.client.version()['Components'][0]['Version']
-        logging.info("Docker Server version: {version}".format(version=version))
+        logging.info(f"Docker Server version: {version}")
         return version
 
+    def start_ade(self):
+        logging.info("Starting ADE (maybe)...")
+        self.terminal.clear()
+        self.inputpipe.startDetached("/bin/bash", ["-c", "echo 'cd ~/ade-home/2021 && ade start' > /mnt/inputpipe"])
 
+
+    def start_obstacle(self):
+        logging.info("Starting ROS obstacle (tmux)...")
+        self.tmux_server.start_stack("obstacle_11_combined_perception.launch.py")
+    def start_freedrive(self):
+        logging.info("Starting ROS freedrive (tmux)...")
+        self.tmux_server.start_stack("freedrive_11_combined_perception.launch.py")
+
+
+    # just here for legacy reasons
+    def start_obstacle_vnc(self):
+        logging.info("Starting ROS obstacle (VNC)...")
+        asyncio.run(vnc.start_ros2("obstacle_11_combined_perception.launch.py"))
+    def start_freedrive_vnc(self):
+        logging.info("Starting ROS freedrive (VNC)...")
+        asyncio.run(vnc.start_ros2("freedrive_11_combined_perception.launch.py"))
+
+    def handle_stdout(self):
+        data = self.outputpipe.readAllStandardOutput()
+        stdout = bytes(data).decode("utf8")
+        self.terminal.appendPlainText(stdout)
+
+    def handle_stderr(self):
+        data = self.outputpipe.readAllStandardError()
+        stderr = bytes(data).decode("utf8")
+        self.terminal.appendPlainText(stderr)

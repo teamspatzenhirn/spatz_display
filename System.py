@@ -1,5 +1,6 @@
 import sys
 
+from PySide6 import QtCore
 from PySide6.QtWidgets import (
     QWidget,
     QGridLayout,
@@ -23,6 +24,7 @@ class System:
 
 
 class SystemTab(QWidget):
+
     def __init__(self, parent: QWidget):
         super().__init__(parent)
 
@@ -51,6 +53,11 @@ class SystemTab(QWidget):
         layout.addWidget(button_shutdown, 1, 1)
 
         self.setLayout(layout)
+
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(1000*60*5) # starts after 5 minutes
+        self.timer.timeout.connect(self.startScreenSaver)
+        self.timer.start()
 
     def startScreenSaver(self):
         logging.info("Starting Screensaver")
